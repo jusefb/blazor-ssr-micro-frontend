@@ -1,0 +1,60 @@
+@inject IProjectService _projectService;
+
+<div id="project-summary-table" class="card p-5 m-5">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Project Description</th>
+            <th>Project Status</th>
+            <th width="160px">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var project in Projects)
+        {
+            <tr>
+                <td>@project.ProjectName</td>
+                <td>@project.ProjectDescription</td>
+                <td>@project.ProjectStatus</td>
+                <td>
+                    @if (project.ProjectStatus == "Active")
+                    {
+                        <button
+                            type="button"
+                            class="btn-primary btn-sm"
+                            hx-post="/api/projects/mark-done/@project.ProjectId"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-target="#project-summary-table">
+                            Mark as Done
+                        </button>
+                    }
+                    else
+                    {
+                        <button
+                            type="button"
+                            class="btn-primary btn-sm"
+                            hx-post="/api/projects/mark-active/@project.ProjectId"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-target="#project-summary-table">
+                            Mark as Active
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    public List<ProjectSummaryDto> Projects { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Projects = await _projectService.GetProjectSummaries();
+    }
+
+}
